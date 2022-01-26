@@ -15,91 +15,94 @@ export default async function getArtDirectedImages(
   formatOptions,
   rest
 ) {
-  const images = [];
+  const images = await Promise.all(
+    artDirectives.map(
+      async ({
+        src,
+        media,
+        placeholder: directivePlaceholder,
+        breakpoints: directiveBreakpoints,
+        objectFit,
+        objectPosition,
+        format: directiveFormat,
+        fallbackFormat: directiveFallbackFormat,
+        includeSourceFormat: directiveIncludeSourceFormat,
+        formatOptions: directiveFormatOptions = {},
+        ...configOptions
+      }) => {
+        const {
+          path,
+          rest: rest2,
+          image,
+          imageWidth,
+          imageHeight,
+          imageFormat,
+        } = await getProcessedImage(src, configOptions);
 
-  for (const {
-    src,
-    media,
-    placeholder: directivePlaceholder,
-    breakpoints: directiveBreakpoints,
-    objectFit,
-    objectPosition,
-    format: directiveFormat,
-    fallbackFormat: directiveFallbackFormat,
-    includeSourceFormat: directiveIncludeSourceFormat,
-    formatOptions: directiveFormatOptions = {},
-    ...configOptions
-  } of artDirectives) {
-    const {
-      path,
-      rest: rest2,
-      image,
-      imageWidth,
-      imageHeight,
-      imageFormat,
-    } = await getProcessedImage(src, configOptions);
+        rest2.aspect = `${imageWidth / imageHeight}`;
 
-    rest2.aspect = `${imageWidth / imageHeight}`;
+        const { formats, requiredBreakpoints } = getConfigOptions(
+          imageWidth,
+          directiveBreakpoints || breakpoints,
+          directiveFormat || format,
+          imageFormat,
+          directiveFallbackFormat || fallbackFormat,
+          directiveIncludeSourceFormat || includeSourceFormat
+        );
 
-    const { formats, requiredBreakpoints } = getConfigOptions(
-      imageWidth,
-      directiveBreakpoints || breakpoints,
-      directiveFormat || format,
-      imageFormat,
-      directiveFallbackFormat || fallbackFormat,
-      directiveIncludeSourceFormat || includeSourceFormat
-    );
+        const maxWidth = requiredBreakpoints.at(-1);
 
-    const maxWidth = requiredBreakpoints.at(-1);
+        const sources = await Promise.all(
+          formats.map(async (format) => {
+            const params = stringifyParams({
+              ...rest,
+              ...rest2,
+              ...formatOptions[format],
+              ...directiveFormatOptions[format],
+            });
 
-    const sources = [];
+            const { default: srcset } = await import(
+              `${path}?srcset&w=${requiredBreakpoints.join(
+                ";"
+              )}&format=${format}${params}`
+            );
 
-    for (const format of formats) {
-      const params = stringifyParams({
-        ...rest,
-        ...rest2,
-        ...formatOptions[format],
-        ...directiveFormatOptions[format],
-      });
+            return {
+              format,
+              srcset,
+            };
+          })
+        );
 
-      const { default: srcset } = await import(
-        `${path}?srcset&w=${requiredBreakpoints.join(
-          ";"
-        )}&format=${format}${params}`
-      );
+        const sizes = {
+          width: maxWidth,
+          height: Math.round(maxWidth / rest2.aspect),
+        };
 
-      sources.push({
-        format,
-        srcset,
-      });
-    }
+        const object = {
+          fit: objectFit,
+          position: objectPosition,
+        };
 
-    const sizes = {
-      width: maxWidth,
-      height: Math.round(maxWidth / rest2.aspect),
-    };
+        const fallback = await getFallbackImage(
+          src,
+          directivePlaceholder || placeholder,
+          image,
+          imageFormat,
+          { ...formatOptions, ...directiveFormatOptions },
+          { ...rest, ...rest2 }
+        );
 
-    const object = {
-      fit: objectFit,
-      position: objectPosition,
-    };
-
-    const fallback = await getFallbackImage(
-      directivePlaceholder || placeholder,
-      image,
-      imageFormat,
-      { ...formatOptions, ...directiveFormatOptions },
-      { ...rest, ...rest2 }
-    );
-
-    images.push({
-      media,
-      sources,
-      sizes,
-      object,
-      fallback,
-    });
-  }
+        return {
+          media,
+          sources,
+          sizes,
+          object,
+          fallback,
+        };
+      }
+    )
+  );
 
   return images;
 }

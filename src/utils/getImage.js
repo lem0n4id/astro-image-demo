@@ -35,30 +35,31 @@ export default async function (
   rest.aspect = `${imageWidth / imageHeight}`;
   fallbackFormat ||= imageFormat;
 
-  const mainImage = await getImageSources(
-    src,
-    image,
-    format,
-    imageWidth,
-    breakpoints,
-    placeholder,
-    imageFormat,
-    fallbackFormat,
-    formatOptions,
-    includeSourceFormat,
-    rest
-  );
-
-  const artDirectedImages = await getArtDirectedImages(
-    artDirectives,
-    placeholder,
-    format,
-    breakpoints,
-    fallbackFormat,
-    includeSourceFormat,
-    formatOptions,
-    rest
-  );
+  const [mainImage, artDirectedImages] = await Promise.all([
+    getImageSources(
+      src,
+      image,
+      format,
+      imageWidth,
+      breakpoints,
+      placeholder,
+      imageFormat,
+      fallbackFormat,
+      formatOptions,
+      includeSourceFormat,
+      rest
+    ),
+    getArtDirectedImages(
+      artDirectives,
+      placeholder,
+      format,
+      breakpoints,
+      fallbackFormat,
+      includeSourceFormat,
+      formatOptions,
+      rest
+    ),
+  ]);
 
   const images = [...artDirectedImages, mainImage];
 

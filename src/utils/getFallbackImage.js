@@ -2,38 +2,10 @@
 
 import util from "util";
 import potrace from "potrace";
-import {
-  applyTransforms,
-  builtins,
-  generateTransforms,
-} from "./imagetools-core";
-
-const getTracedSVG = async (image, { tracedSVG }) => {
-  const traceSVG = util.promisify(potrace[tracedSVG.function]);
-  const svg = await traceSVG(await image.toBuffer(), tracedSVG.options);
-  return `data:image/svg+xml;utf8,${svg}`;
-};
-
-const getDominantColor = async (image) => {
-  const { dominant } = await image.stats();
-  const { r, g, b } = dominant;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" style="background: rgb(${r},${g},${b})"></svg>`;
-  return `data:image/svg+xml;utf8,${svg}`;
-};
-
-const getBlurredFallback = async (image, format, formatOptions, rest) => {
-  const { transforms } = generateTransforms(
-    { w: 20, ...rest, ...formatOptions[format] },
-    builtins
-  );
-  const { image: fallbackImage } = await applyTransforms(transforms, image);
-  const fallbackImageBuffer = await fallbackImage.toBuffer();
-  const fallbackImageBase64 = fallbackImageBuffer.toString("base64");
-  const dataUri = `data:image/${format};base64,${fallbackImageBase64}`;
-  return dataUri;
-};
+import stringifyParams from "./stringifyParams";
 
 export default async function getFallbackImage(
+  src,
   placeholder,
   image,
   format,
@@ -42,10 +14,20 @@ export default async function getFallbackImage(
 ) {
   switch (placeholder) {
     case "blurred":
-      return await getBlurredFallback(image, format, formatOptions, rest);
+      const params = stringifyParams({ ...rest, ...formatOptions[format] });
+      const { default: dataUri } = await import(
+        `${src}?inline&format=${format}&w=20${params}`
+      );
+      return dataUri;
     case "tracedSVG":
-      return await getTracedSVG(image, formatOptions);
+      const { function: fn, options } = formatOptions.tracedSVG;
+      const traceSVG = util.promisify(potrace[fn]);
+      const tracedSVG = await traceSVG(await image.toBuffer(), options);
+      return `data:image/svg+xml;utf8,${tracedSVG}`;
     default:
-      return await getDominantColor(image);
+      const { dominant } = await image.stats();
+      const { r, g, b } = dominant;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" style="background: rgb(${r},${g},${b})"></svg>`;
+      return `data:image/svg+xml;utf8,${svg}`;
   }
 }

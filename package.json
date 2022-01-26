@@ -5,10 +5,11 @@
     "reload": "astro --reload"
   },
   "dependencies": {
-    "astro": "^0.22.9",
-    "imagetools-core": "^3.0.1",
+    "@astropub/codecs": "^0.4.4",
+    "astro": "^0.22.18",
+    "imagetools-core": "^3.0.2",
     "potrace": "^2.1.8",
     "sharp": "^0.29.3",
-    "vite-imagetools": "^4.0.1"
+    "vite-imagetools": "^4.0.3"
   }
 }

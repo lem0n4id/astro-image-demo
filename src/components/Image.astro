@@ -56,7 +56,7 @@ const imagesrcset =
   images.at(-1).sources.find(({ format: fmt }) => fmt === preload)?.srcset;
 const imagesizes = `(min-width: ${width}px) ${width}px, 100vw`;
 
-const StyleTag = "style";
+const StyleSheet = "style";
 ---
 
 {preload && (
@@ -68,7 +68,7 @@ const StyleTag = "style";
   />
 )}
 
-<StyleTag>
+<StyleSheet>
   {images
     .map(({ media, fallback, object }) =>
       media
@@ -91,7 +91,7 @@ const StyleTag = "style";
     )
     .reverse()
     .join("\n\n")}
-</StyleTag>
+</StyleSheet>
 
 {images.length > 1 && `<picture>`}
 {images.map(({ media, sources, sizes, object }) => (

@@ -27,29 +27,28 @@ export default async function getImageSources(
   );
 
   const maxWidth = requiredBreakpoints.at(-1);
+  const sliceLength = -(maxWidth.toString().length + 2);
 
-  const params = stringifyParams({ ...rest, ...formatOptions[fallbackFormat] });
+  const sources = await Promise.all(
+    formats.map(async (format) => {
+      const params = stringifyParams({ ...rest, ...formatOptions[format] });
 
-  const { default: fallbackImageSource } = await import(
-    `${src}?w=${maxWidth}&format=${fallbackFormat}${params}`
+      const { default: srcset } = await import(
+        `${src}?srcset&w=${requiredBreakpoints.join(
+          ";"
+        )}&format=${format}${params}`
+      );
+
+      return {
+        src:
+          format === fallbackFormat
+            ? srcset.split(", ").at(-1).slice(0, sliceLength)
+            : null,
+        format,
+        srcset,
+      };
+    })
   );
-
-  const sources = [];
-
-  for (const format of formats) {
-    const params = stringifyParams({ ...rest, ...formatOptions[format] });
-    const { default: srcset } = await import(
-      `${src}?srcset&w=${requiredBreakpoints.join(
-        ";"
-      )}&format=${format}${params}`
-    );
-
-    sources.push({
-      src: format === fallbackFormat && fallbackImageSource,
-      format,
-      srcset,
-    });
-  }
 
   const sizes = {
     width: maxWidth,
@@ -57,6 +56,7 @@ export default async function getImageSources(
   };
 
   const fallback = await getFallbackImage(
+    src,
     placeholder,
     image,
     fallbackFormat,
