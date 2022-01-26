@@ -112,7 +112,7 @@ export default {
             this.emitFile({
               name,
               type: "asset",
-              source: await encodedImage.toBuffer(),
+              source: await encodedImage.clone().toBuffer(),
             })
           );
 
