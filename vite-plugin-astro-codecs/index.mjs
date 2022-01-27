@@ -46,14 +46,14 @@ export default {
         } else {
           const resizedImage = await getResizedImage(src, width, image);
 
-          const encodedImage = await codecs[format].encode(
+          const { data } = await codecs[format].encode(
             resizedImage,
             quality ? { quality: parseInt(quality) } : {}
           );
 
-          const dataUri = `data:${type};base64,${Buffer.from(
-            encodedImage
-          ).toString("base64")}`;
+          const dataUri = `data:${type};base64,${Buffer.from(data).toString(
+            "base64"
+          )}`;
 
           encodedImages.set(assetName, dataUri);
           return `export default "${dataUri}"`;
@@ -72,12 +72,12 @@ export default {
             if (!encodedImages.has(path)) {
               const resizedImage = await getResizedImage(src, width, image);
 
-              const encodedImage = await codecs[format].encode(
+              const { data } = await codecs[format].encode(
                 resizedImage,
                 quality ? { quality: parseInt(quality) } : {}
               );
 
-              const buffer = Buffer.from(encodedImage);
+              const buffer = Buffer.from(data);
 
               encodedImages.set(path, {
                 type,
@@ -115,7 +115,6 @@ export default {
 
   async generateBundle(_options, bundle) {
     for (const [src, image] of encodedImages.entries()) {
-      console.log(src);
       for (const [id, output] of Object.entries(bundle)) {
         if (typeof output.source === "string" && output.source.match(src)) {
           const { buffer, name } = image;
