@@ -46,14 +46,15 @@ export default {
         } else {
           const resizedImage = await getResizedImage(src, width, image);
 
-          const { data } = await codecs[format].encode(
-            resizedImage,
-            quality ? { quality: parseInt(quality) } : {}
-          );
+          const encodedImage = quality
+            ? await codecs[format].encode(resizedImage, {
+                quality: parseInt(quality),
+              })
+            : await resizedImage.encode(type);
 
-          const dataUri = `data:${type};base64,${Buffer.from(data).toString(
-            "base64"
-          )}`;
+          const dataUri = `data:${type};base64,${Buffer.from(
+            encodedImage.data
+          ).toString("base64")}`;
 
           encodedImages.set(assetName, dataUri);
           return `export default "${dataUri}"`;
@@ -72,12 +73,13 @@ export default {
             if (!encodedImages.has(path)) {
               const resizedImage = await getResizedImage(src, width, image);
 
-              const { data } = await codecs[format].encode(
-                resizedImage,
-                quality ? { quality: parseInt(quality) } : {}
-              );
+              const encodedImage = quality
+                ? await codecs[format].encode(resizedImage, {
+                    quality: parseInt(quality),
+                  })
+                : await resizedImage.encode(type);
 
-              const buffer = Buffer.from(data);
+              const buffer = Buffer.from(encodedImage.data);
 
               encodedImages.set(path, {
                 type,

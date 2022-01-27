@@ -27,7 +27,7 @@ export const getResizedImage = async (src, width, image) => {
     return resizedImages.get(key);
   }
 
-  const resizedImage = await codecs.resize(image, { width });
+  const resizedImage = await image.resize({ width });
 
   resizedImages.set(key, resizedImage);
   return resizedImage;
