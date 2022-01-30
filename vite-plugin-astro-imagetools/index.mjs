@@ -1,7 +1,7 @@
 // @ts-check
 import { basename, extname } from "path";
 import {
-  getLoadedImage,
+  getDecodedImage,
   getConfigOptions,
   getEncodedImage,
   getImagePath,
@@ -23,7 +23,7 @@ export default {
 
       const config = Object.fromEntries(searchParams);
 
-      const { image, metadata } = await getLoadedImage(src);
+      const { image, metadata } = await getDecodedImage(src, ext);
 
       const { type, hash, widths, options, extension, inline } =
         getConfigOptions(config, ext, metadata);
@@ -69,7 +69,7 @@ export default {
                 type,
                 name,
                 extension,
-                encodedImage,
+                encodedImage: encodedImage.clone(),
               });
             }
 

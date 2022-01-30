@@ -5,7 +5,7 @@ import crypto from "crypto";
 
 const decodedImages = new Map();
 
-export const getLoadedImage = async (src) => {
+export const getDecodedImage = async (src, ext) => {
   if (decodedImages.has(src)) {
     return decodedImages.get(src);
   }
