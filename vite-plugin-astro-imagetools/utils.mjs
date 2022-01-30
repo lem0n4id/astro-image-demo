@@ -1,6 +1,10 @@
 // @ts-check
-import { applyTransforms, builtins, generateTransforms } from "imagetools-core";
-import sharp from "sharp";
+import {
+  builtins,
+  loadImage,
+  applyTransforms,
+  generateTransforms,
+} from "imagetools-core";
 import crypto from "crypto";
 
 const decodedImages = new Map();
@@ -10,7 +14,7 @@ export const getLoadedImage = async (src) => {
     return decodedImages.get(src);
   }
 
-  const image = sharp(src);
+  const image = loadImage(src);
   const metadata = await image.metadata();
 
   const returnObject = {
