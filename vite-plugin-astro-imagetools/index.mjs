@@ -35,7 +35,7 @@ export default {
           );
         }
 
-        const width = widths[0];
+        const [width] = widths;
 
         const { assetName } = getImagePath(base, extension, width, hash);
 
@@ -103,22 +103,31 @@ export default {
   },
 
   async generateBundle(_options, bundle) {
-    for (const [src, image] of encodedImages.entries()) {
-      for (const [id, output] of Object.entries(bundle)) {
-        if (typeof output.source === "string" && output.source.match(src)) {
-          const { encodedImage, name } = image;
-
-          const fileName = this.getFileName(
-            this.emitFile({
-              name,
-              type: "asset",
-              source: await encodedImage.clone().toBuffer(),
-            })
-          );
-
-          output.source = output.source.replace(src, fileName);
-        }
+    const outputs = [];
+    for (const [, output] of Object.entries(bundle)) {
+      if (typeof output.source === "string") {
+        outputs.push(output);
       }
     }
+
+    await Promise.all(
+      [...encodedImages.entries()].map(async ([src, image]) => {
+        for (const output of outputs) {
+          if (output.source.match(src)) {
+            const { encodedImage, name } = image;
+
+            const fileName = this.getFileName(
+              this.emitFile({
+                name,
+                type: "asset",
+                source: await encodedImage.clone().toBuffer(),
+              })
+            );
+
+            output.source = output.source.replace(src, fileName);
+          }
+        }
+      })
+    );
   },
 };
