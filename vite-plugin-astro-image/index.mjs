@@ -1,16 +1,27 @@
 // @ts-check
+import { Readable } from "stream";
 import { basename, extname } from "path";
-import {
-  getLoadedImage,
-  getConfigOptions,
-  getEncodedImage,
-  getImagePath,
-} from "./utils.mjs";
 
-const encodedImages = new Map();
+import getImagePath from "./utils/getImagePath.mjs";
+import getLoadedImage from "./utils/getLoadedImage.mjs";
+import getConfigOptions from "./utils/getConfigOptions.mjs";
+import getImage from "./utils/getOptimizedImage.mjs";
+
+const optimizedImages = new Map();
+
+const sharp = await (async () => {
+  try {
+    if (await import("sharp")) {
+      return true;
+    }
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+})();
 
 export default {
-  name: "vite-plugin-astro-imagetools",
+  name: "vite-plugin-astro-image",
   enforce: "pre",
   async load(id) {
     const { search, searchParams } = new URL(`file://${id}`);
@@ -23,10 +34,10 @@ export default {
 
       const config = Object.fromEntries(searchParams);
 
-      const { image, metadata } = await getLoadedImage(src);
+      const { loadedImage, imageWidth } = await getLoadedImage(src, ext, sharp);
 
       const { type, hash, widths, options, extension, inline } =
-        getConfigOptions(config, ext, metadata);
+        getConfigOptions(config, ext, imageWidth);
 
       if (inline) {
         if (widths.length > 1) {
@@ -39,19 +50,17 @@ export default {
 
         const { assetName } = getImagePath(base, extension, width, hash);
 
-        if (encodedImages.has(assetName)) {
-          return `export default "${encodedImages.get(assetName)}"`;
+        if (optimizedImages.has(assetName)) {
+          return `export default "${optimizedImages.get(assetName)}"`;
         } else {
-          const encodedImage = await getEncodedImage(image, {
-            width,
-            ...options,
-          });
+          const config = { width, ...options };
 
-          const dataUri = `data:${type};base64,${(
-            await encodedImage.clone().toBuffer()
-          ).toString("base64")}`;
+          const params = [src, loadedImage, config, sharp, type, true];
 
-          encodedImages.set(assetName, dataUri);
+          // @ts-ignore
+          const { dataUri } = await getImage(...params);
+
+          optimizedImages.set(assetName, dataUri);
           return `export default "${dataUri}"`;
         }
       } else {
@@ -59,18 +68,19 @@ export default {
           widths.map(async (width) => {
             const { name, path } = getImagePath(base, extension, width, hash);
 
-            if (!encodedImages.has(path)) {
-              const encodedImage = await getEncodedImage(image, {
-                width,
-                ...options,
-              });
+            if (!optimizedImages.has(path)) {
+              const config = { width, ...options };
 
-              encodedImages.set(path, {
-                type,
-                name,
-                extension,
-                encodedImage,
-              });
+              const params = [src, loadedImage, config, sharp, type];
+
+              const image = await getImage(...params);
+
+              // @ts-ignore
+              const buffer = sharp ? null : image.buffer;
+
+              const imageObject = { type, name, buffer, extension, image };
+
+              optimizedImages.set(path, imageObject);
             }
 
             return { width, path };
@@ -89,13 +99,19 @@ export default {
 
   configureServer(server) {
     server.middlewares.use(async (request, response, next) => {
-      const image = encodedImages.get(request.url);
+      const imageObject = optimizedImages.get(request.url);
 
-      if (image) {
-        const { encodedImage, type } = image;
+      if (imageObject) {
+        const { type, buffer, image } = imageObject;
+
         response.setHeader("Content-Type", type);
         response.setHeader("Cache-Control", "no-cache");
-        return encodedImage.clone().pipe(response);
+
+        if (buffer) {
+          return Readable.from(buffer).pipe(response);
+        }
+
+        return image.clone().pipe(response);
       }
 
       next();
@@ -111,16 +127,16 @@ export default {
     }
 
     await Promise.all(
-      [...encodedImages.entries()].map(async ([src, image]) => {
+      [...optimizedImages.entries()].map(async ([src, imageObject]) => {
         for (const output of outputs) {
           if (output.source.match(src)) {
-            const { encodedImage, name } = image;
+            const { name, buffer, image } = imageObject;
 
             const fileName = this.getFileName(
               this.emitFile({
                 name,
                 type: "asset",
-                source: await encodedImage.clone().toBuffer(),
+                source: buffer || (await image.clone().toBuffer()),
               })
             );
 
