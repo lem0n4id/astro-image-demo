@@ -66,41 +66,43 @@ const bgStyles = getBackgroundStyles(images, uuid, objectFit, objectPosition);
 
 {bgStyles.length > 0 && <style set:html={bgStyles.join("\n\n")}></style>}
 
-{<Fragment set:html={images.length > 1 && `<picture>`} />
-{images.map(({ media, sources, sizes, object }) => (
-  <Fragment>
-    {sources.map(({ format, src, srcset }) =>
-      src ? (
-        <img
-          class={uuid}
-          src={src}
-          alt={alt}
-          {...sizes}
-          srcset={srcset}
-          loading={loading}
-          sizes={imagesizes}
-          decoding={decoding}
-          onload="style.backgroundImage = 'none'"
-          style={
-            layout === "fill"
-              ? `width: 100%; height: 100%;`
-              : layout === "fullWidth"
-              ? `width: 100%; height: auto;`
-              : layout === "constrained"
-              ? "max-width: 100%; height: auto;"
-              : null
-          }
-        />
-      ) : (
-        <source
-          {...sizes}
-          media={media}
-          type={`image/${format}`}
-          srcset={srcset}
-          sizes={imagesizes}
-        />
-      )
-    )}
-  </Fragment>
-))}
-{<Fragment set:html={images.length > 1 && `</picture>`} />
+{(() => {
+  const sources = images.map(({ media, sources, sizes, object }) => (
+    <Fragment>
+      {sources.map(({ format, src, srcset }) =>
+        src ? (
+          <img
+            class={uuid}
+            src={src}
+            alt={alt}
+            {...sizes}
+            srcset={srcset}
+            loading={loading}
+            sizes={imagesizes}
+            decoding={decoding}
+            onload="style.backgroundImage = 'none'"
+            style={
+              layout === "fill"
+                ? `width: 100%; height: 100%;`
+                : layout === "fullWidth"
+                ? `width: 100%; height: auto;`
+                : layout === "constrained"
+                ? "max-width: 100%; height: auto;"
+                : null
+            }
+          />
+        ) : (
+          <source
+            {...sizes}
+            media={media}
+            type={`image/${format}`}
+            srcset={srcset}
+            sizes={imagesizes}
+          />
+        )
+      )}
+    </Fragment>
+  ));
+
+  return images.length > 1 ? <picture>{sources}</picture> : sources;
+})()}
