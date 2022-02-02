@@ -52,8 +52,6 @@ const imagesrcset =
   images.at(-1).sources.find(({ format: fmt }) => fmt === preload)?.srcset;
 const imagesizes = `(min-width: ${width}px) ${width}px, 100vw`;
 
-const StyleSheet = "style";
-
 const bgStyles = getBackgroundStyles(images, uuid, objectFit, objectPosition);
 ---
 
@@ -66,9 +64,9 @@ const bgStyles = getBackgroundStyles(images, uuid, objectFit, objectPosition);
   />
 )}
 
-{bgStyles.length > 0 && <StyleSheet>{bgStyles.join("\n\n")}</StyleSheet>}
+{bgStyles.length > 0 && <style set:html={bgStyles.join("\n\n")}></style>}
 
-{images.length > 1 && `<picture>`}
+{<Fragment set:html={images.length > 1 && `<picture>`} />
 {images.map(({ media, sources, sizes, object }) => (
   <Fragment>
     {sources.map(({ format, src, srcset }) =>
@@ -105,4 +103,4 @@ const bgStyles = getBackgroundStyles(images, uuid, objectFit, objectPosition);
     )}
   </Fragment>
 ))}
-{images.length > 1 && `</picture>`}
+{<Fragment set:html={images.length > 1 && `</picture>`} />

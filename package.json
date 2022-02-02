@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@astropub/codecs": "^0.4.4",
-    "astro": "^0.22.20",
+    "astro": "next",
     "imagetools-core": "^3.0.2",
     "potrace": "^2.1.8",
     "sharp": "^0.29.3",
