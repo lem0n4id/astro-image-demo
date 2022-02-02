@@ -63,7 +63,17 @@ export default async function (
 
   const images = [...artDirectedImages, mainImage];
 
-  imagesData.set(hash, images);
+  const uuid = `astro-image-${crypto
+    .randomBytes(4)
+    .toString("hex")
+    .toUpperCase()}`;
 
-  return images;
+  const returnObject = {
+    uuid,
+    images,
+  };
+
+  imagesData.set(hash, returnObject);
+
+  return returnObject;
 }

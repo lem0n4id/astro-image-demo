@@ -32,7 +32,7 @@ const {
 const label = `Image at ${src} optimized in`;
 
 console.time(label);
-const images = await getImage(
+const { uuid, images } = await getImage(
   src,
   format,
   breakpoints,
@@ -45,11 +45,6 @@ const images = await getImage(
   astroConfig.image
 );
 console.timeEnd(label);
-
-const uuid = `astro-image-${crypto
-  .randomBytes(4)
-  .toString("hex")
-  .toUpperCase()}`;
 
 const { width, height } = images.at(-1).sizes;
 
