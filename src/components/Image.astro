@@ -4,6 +4,8 @@ import type ImageConfig from "/src/interfaces/ImageConfig.ts";
 import getImage from "../utils/getImage.js";
 import astroConfig from "/astro.config";
 
+import getBackgroundStyles from "../utils/component/getBackgroundStyles.js";
+
 const {
   src,
   alt,
@@ -58,29 +60,7 @@ const imagesizes = `(min-width: ${width}px) ${width}px, 100vw`;
 
 const StyleSheet = "style";
 
-const bgStyles = images
-  .map(({ media, fallback, object }) =>
-    fallback
-      ? media
-        ? `@media ${media} {
-  .${uuid} {
-    object-fit: ${object?.fit || objectFit};
-    object-position: ${object?.position || objectPosition};
-    background-image: url('${encodeURI(fallback)}');
-    background-size: ${object?.fit || objectFit};
-    background-position: ${object?.position || objectPosition};
-  }
-}`
-        : `.${uuid} {
-  object-fit: ${objectFit};
-  object-position: ${objectPosition};
-  background-image: url('${encodeURI(fallback)}');
-  background-size: ${objectFit};
-  background-position: ${objectPosition};
-}`
-      : null
-  )
-  .filter(Boolean);
+const bgStyles = getBackgroundStyles(images, uuid, objectFit, objectPosition);
 ---
 
 {preload && (
@@ -92,9 +72,7 @@ const bgStyles = images
   />
 )}
 
-{bgStyles.length > 0 && (
-  <StyleSheet>{bgStyles.reverse().join("\n\n")}</StyleSheet>
-)}
+{bgStyles.length > 0 && <StyleSheet>{bgStyles.join("\n\n")}</StyleSheet>}
 
 {images.length > 1 && `<picture>`}
 {images.map(({ media, sources, sizes, object }) => (
