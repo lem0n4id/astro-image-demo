@@ -24,10 +24,12 @@ export default async function getFallbackImage(
       const traceSVG = util.promisify(potrace[fn]);
       const tracedSVG = await traceSVG(await image.toBuffer(), options);
       return `data:image/svg+xml;utf8,${tracedSVG}`;
-    default:
+    case "dominantColor":
       const { dominant } = await image.stats();
       const { r, g, b } = dominant;
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" style="background: rgb(${r},${g},${b})"></svg>`;
       return `data:image/svg+xml;utf8,${svg}`;
+    default:
+      return null;
   }
 }

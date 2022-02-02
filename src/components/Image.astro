@@ -57,21 +57,11 @@ const imagesrcset =
 const imagesizes = `(min-width: ${width}px) ${width}px, 100vw`;
 
 const StyleSheet = "style";
----
 
-{preload && (
-  <link
-    rel="preload"
-    as="image"
-    imagesrcset={imagesrcset}
-    imagesizes={imagesizes}
-  />
-)}
-
-<StyleSheet>
-  {images
-    .map(({ media, fallback, object }) =>
-      media
+const bgStyles = images
+  .map(({ media, fallback, object }) =>
+    fallback
+      ? media
         ? `@media ${media} {
   .${uuid} {
     object-fit: ${object?.fit || objectFit};
@@ -88,10 +78,23 @@ const StyleSheet = "style";
   background-size: ${objectFit};
   background-position: ${objectPosition};
 }`
-    )
-    .reverse()
-    .join("\n\n")}
-</StyleSheet>
+      : null
+  )
+  .filter(Boolean);
+---
+
+{preload && (
+  <link
+    rel="preload"
+    as="image"
+    imagesrcset={imagesrcset}
+    imagesizes={imagesizes}
+  />
+)}
+
+{bgStyles.length > 0 && (
+  <StyleSheet>{bgStyles.reverse().join("\n\n")}</StyleSheet>
+)}
 
 {images.length > 1 && `<picture>`}
 {images.map(({ media, sources, sizes, object }) => (
