@@ -15,7 +15,6 @@ const sharp = await (async () => {
       return true;
     }
   } catch (error) {
-    console.error(error);
     return false;
   }
 })();
