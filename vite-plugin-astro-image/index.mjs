@@ -20,6 +20,15 @@ const sharp = await (async () => {
   }
 })();
 
+const supportedFileTypes = [
+  "avif",
+  "jpeg",
+  "jpg",
+  "png",
+  "webp",
+  ...(sharp ? ["heic", "heif", "tiff", "gif"] : ["jxl", "wp2"]),
+];
+
 export default {
   name: "vite-plugin-astro-image",
   enforce: "pre",
@@ -35,7 +44,7 @@ export default {
     const src = id.replace(search, "");
     const ext = extname(src).slice(1);
 
-    if (/(heic|heif|avif|jpg|jpeg|png|tiff|webp|gif)/i.test(ext)) {
+    if (supportedFileTypes.includes(ext)) {
       const base = basename(src, extname(src));
 
       const config = Object.fromEntries(searchParams);
