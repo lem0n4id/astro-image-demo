@@ -6,12 +6,12 @@ import {
   applyTransforms,
   builtins,
   generateTransforms,
-  parseURL,
   loadImage,
 } from "./imagetools-core";
 
 export default async (src, configOptions, globalConfigOptions) => {
-  const { search, searchParams } = parseURL(src);
+  const { search, searchParams } = new URL(src, "file://");
+
   const paramOptions = Object.fromEntries(searchParams);
 
   src = src.slice(0, src.lastIndexOf(search));
