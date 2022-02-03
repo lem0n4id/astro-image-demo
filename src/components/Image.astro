@@ -45,11 +45,12 @@ const { uuid, images } = await getImage(
 );
 console.timeEnd(label);
 
-const { width, height } = images.at(-1).sizes;
+const { width } = images.at(-1).sizes;
 
 const imagesrcset =
   preload &&
   images.at(-1).sources.find(({ format: fmt }) => fmt === preload)?.srcset;
+
 const imagesizes = `(min-width: ${width}px) ${width}px, 100vw`;
 
 const bgStyles = getBackgroundStyles(images, uuid, objectFit, objectPosition);
@@ -67,7 +68,7 @@ const bgStyles = getBackgroundStyles(images, uuid, objectFit, objectPosition);
 {bgStyles.length > 0 && <style set:html={bgStyles.join("\n\n")}></style>}
 
 {(() => {
-  const sources = images.map(({ media, sources, sizes, object }) => (
+  const sources = images.map(({ media, sources, sizes }) => (
     <Fragment>
       {sources.map(({ format, src, srcset }) =>
         src ? (
