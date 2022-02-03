@@ -24,7 +24,13 @@ export default {
   name: "vite-plugin-astro-image",
   enforce: "pre",
   async load(id) {
-    const { search, searchParams } = new URL(`file://${id}`);
+    try {
+      var fileURL = new URL(`file://${id}`);
+    } catch (error) {
+      return null;
+    }
+
+    const { search, searchParams } = fileURL;
 
     const src = id.replace(search, "");
     const ext = extname(src).slice(1);
