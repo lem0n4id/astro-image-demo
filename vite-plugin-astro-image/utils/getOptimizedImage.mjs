@@ -1,7 +1,4 @@
 // @ts-check
-import * as codecs from "@astropub/codecs";
-import { builtins, applyTransforms, generateTransforms } from "imagetools-core";
-
 const resizedImages = new Map();
 
 export default async function getImage(
@@ -13,6 +10,10 @@ export default async function getImage(
   dataUri
 ) {
   if (sharp) {
+    const { builtins, applyTransforms, generateTransforms } = await import(
+      "imagetools-core"
+    );
+
     const { transforms } = generateTransforms(config, builtins);
 
     const { image: encodedImage } = await applyTransforms(
@@ -30,6 +31,8 @@ export default async function getImage(
 
     return encodedImage;
   } else {
+    const codecs = await import("@astropub/codecs");
+
     const { width, format, quality } = config;
 
     const resizedImageKey = `${src}@${width}`;

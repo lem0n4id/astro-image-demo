@@ -1,6 +1,5 @@
 // @ts-check
 import { readFileSync } from "fs";
-import * as codecs from "@astropub/codecs";
 import { loadImage } from "imagetools-core";
 
 const decodedImages = new Map();
@@ -13,11 +12,11 @@ export default async function getLoadedImage(src, ext, sharp) {
   let image, imageWidth;
 
   if (sharp) {
-    image = loadImage(src);
+    image = (await import("imagetools-core")).loadImage(src);
     imageWidth = (await image.metadata()).width;
   } else {
     const buffer = readFileSync(src);
-    image = await codecs[ext].decode(buffer);
+    image = (await import("@astropub/codecs"))[ext].decode(buffer);
     imageWidth = image.width;
   }
 
