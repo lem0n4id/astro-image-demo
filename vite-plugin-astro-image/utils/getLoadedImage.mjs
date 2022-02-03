@@ -1,6 +1,5 @@
 // @ts-check
 import { readFileSync } from "fs";
-import { loadImage } from "imagetools-core";
 
 const decodedImages = new Map();
 
