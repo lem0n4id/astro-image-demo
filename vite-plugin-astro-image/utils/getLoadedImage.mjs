@@ -21,7 +21,7 @@ export default async function getLoadedImage(src, ext, sharp) {
     const format = ext === "jpeg" ? "jpg" : ext;
 
     const buffer = readFileSync(src);
-    image = codecs[format].decode(buffer);
+    image = await codecs[format].decode(buffer);
     imageWidth = image.width;
   }
 
