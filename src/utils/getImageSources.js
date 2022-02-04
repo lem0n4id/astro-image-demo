@@ -15,6 +15,7 @@ export default async function getImageSources(
   fallbackFormat,
   formatOptions,
   includeSourceFormat,
+  sharp,
   rest
 ) {
   const { formats, requiredBreakpoints } = getConfigOptions(
@@ -60,6 +61,7 @@ export default async function getImageSources(
     placeholder,
     image,
     fallbackFormat,
+    sharp,
     formatOptions,
     rest
   );

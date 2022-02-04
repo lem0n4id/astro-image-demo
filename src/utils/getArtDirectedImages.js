@@ -13,6 +13,7 @@ export default async function getArtDirectedImages(
   fallbackFormat,
   includeSourceFormat,
   formatOptions,
+  sharp,
   rest
 ) {
   const images = await Promise.all(
@@ -39,6 +40,7 @@ export default async function getArtDirectedImages(
           imageFormat,
         } = await getProcessedImage(src, configOptions);
 
+        // @ts-ignore
         rest2.aspect = `${imageWidth / imageHeight}`;
 
         const { formats, requiredBreakpoints } = getConfigOptions(
@@ -89,6 +91,7 @@ export default async function getArtDirectedImages(
           directivePlaceholder || placeholder,
           image,
           imageFormat,
+          sharp,
           { ...formatOptions, ...directiveFormatOptions },
           { ...rest, ...rest2 }
         );

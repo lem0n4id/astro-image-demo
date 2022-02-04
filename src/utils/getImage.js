@@ -59,6 +59,7 @@ export default async function (
       fallbackFormat,
       formatOptions,
       includeSourceFormat,
+      sharp,
       rest
     ),
     getArtDirectedImages(
@@ -69,6 +70,7 @@ export default async function (
       fallbackFormat,
       includeSourceFormat,
       formatOptions,
+      sharp,
       rest
     ),
   ]);
