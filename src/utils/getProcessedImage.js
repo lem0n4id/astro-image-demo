@@ -63,7 +63,7 @@ export default async (src, sharp, configOptions, globalConfigOptions) => {
     // @ts-ignore
     var imageFormat = extension === "jpeg" ? "jpg" : extension;
 
-    const buffer = fs.readFileSync(src);
+    const buffer = fs.readFileSync(`.${src}`);
     const decodedImage = await codecs.jpg.decode(buffer);
 
     // @ts-ignore

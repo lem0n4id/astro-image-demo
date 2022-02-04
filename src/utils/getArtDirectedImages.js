@@ -38,7 +38,7 @@ export default async function getArtDirectedImages(
           imageWidth,
           imageHeight,
           imageFormat,
-        } = await getProcessedImage(src, configOptions);
+        } = await getProcessedImage(src, sharp, configOptions);
 
         // @ts-ignore
         rest2.aspect = `${imageWidth / imageHeight}`;

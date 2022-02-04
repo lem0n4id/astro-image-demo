@@ -29,7 +29,10 @@ export default async function getFallbackImage(
 
       const imageBuffer = sharp
         ? await image.toBuffer()
-        : Buffer.from(await image.encoded(`image/${format}`).data);
+        : Buffer.from(
+            (await image.encode(`image/${format === "jpg" ? "jpeg" : format}`))
+              .data
+          );
 
       const tracedSVG = await traceSVG(imageBuffer, options);
 
