@@ -1,8 +1,12 @@
 {
   "scripts": {
-    "start": "DEBUG=vite astro dev --verbose",
-    "build": "DEBUG=vite astro build --verbose",
-    "reload": "astro --reload"
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "dev@static": "astro dev --experimental-static-build",
+    "start@static": "astro dev --experimental-static-build",
+    "build@static": "astro build --experimental-static-build"
   },
   "dependencies": {
     "@astropub/codecs": "^0.4.4",
