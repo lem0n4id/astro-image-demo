@@ -30,9 +30,10 @@ export default async function (
   globalConfigOptions
 ) {
   const hash = crypto
-    .createHash("sha256")
+    .createHash("md5")
     .update(JSON.stringify(arguments))
-    .digest("hex");
+    .digest("hex")
+    .substring(0, 8);
 
   if (imagesData.has(hash)) {
     return imagesData.get(hash);
@@ -77,13 +78,8 @@ export default async function (
 
   const images = [...artDirectedImages, mainImage];
 
-  const uuid = `astro-image-${crypto
-    .randomBytes(4)
-    .toString("hex")
-    .toUpperCase()}`;
-
   const returnObject = {
-    uuid,
+    hash,
     images,
   };
 

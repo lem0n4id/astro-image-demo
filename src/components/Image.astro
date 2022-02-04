@@ -31,7 +31,7 @@ const {
 const label = `Image at ${src} optimized in`;
 
 console.time(label);
-const { uuid, images } = await getImage(
+const { hash, images } = await getImage(
   src,
   format,
   breakpoints,
@@ -47,13 +47,20 @@ console.timeEnd(label);
 
 const { width } = images.at(-1).sizes;
 
+const className = `astro-image-${hash.toUpperCase()}`;
+
 const imagesrcset =
   preload &&
   images.at(-1).sources.find(({ format: fmt }) => fmt === preload)?.srcset;
 
 const imagesizes = `(min-width: ${width}px) ${width}px, 100vw`;
 
-const bgStyles = getBackgroundStyles(images, uuid, objectFit, objectPosition);
+const bgStyles = getBackgroundStyles(
+  images,
+  className,
+  objectFit,
+  objectPosition
+);
 ---
 
 {preload && (
@@ -73,7 +80,7 @@ const bgStyles = getBackgroundStyles(images, uuid, objectFit, objectPosition);
       {sources.map(({ format, src, srcset }) =>
         src ? (
           <img
-            class={uuid}
+            class={className}
             src={src}
             alt={alt}
             {...sizes}

@@ -2,7 +2,7 @@
 
 export default function getBackgroundStyles(
   images,
-  uuid,
+  className,
   objectFit,
   objectPosition
 ) {
@@ -11,7 +11,7 @@ export default function getBackgroundStyles(
       fallback
         ? media
           ? `@media ${media} {
-  .${uuid} {
+  .${className} {
     object-fit: ${object?.fit || objectFit};
     object-position: ${object?.position || objectPosition};
     background-image: url('${encodeURI(fallback)}');
@@ -19,7 +19,7 @@ export default function getBackgroundStyles(
     background-position: ${object?.position || objectPosition};
   }
 }`
-          : `.${uuid} {
+          : `.${className} {
   object-fit: ${objectFit};
   object-position: ${objectPosition};
   background-image: url('${encodeURI(fallback)}');
