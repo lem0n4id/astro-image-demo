@@ -20,7 +20,15 @@ export default async (src, configOptions, globalConfigOptions) => {
   configOptions.aspect &&= `${configOptions.aspect}`;
   configOptions.ar &&= `${configOptions.ar}`;
 
-  const { width, height, aspect, w, h, ar, ...rest } = configOptions;
+  const {
+    w,
+    h,
+    ar,
+    width = w,
+    height = h,
+    aspect = ar,
+    ...rest
+  } = configOptions;
 
   if (src.match("(http://|https://|data:image/).*")) {
     const hash = crypto.createHash("sha256").update(src).digest("hex");

@@ -87,6 +87,9 @@ declare interface ImageToolsConfigs {
   hue?: number;
   saturation?: number;
   brightness?: number;
+  w?: number;
+  h?: number;
+  ar?: number | string;
   width?: number;
   height?: number;
   aspect?: number | string;
