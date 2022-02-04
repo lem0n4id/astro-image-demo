@@ -56,13 +56,38 @@ export default async (src, sharp, configOptions, globalConfigOptions) => {
   } else {
     const codecs = await import("@astropub/codecs");
 
-    const extension = extname(src);
+    const extension = extname(src).slice(1);
+
+    // @ts-ignore
+    var imageFormat = extension === "jpeg" ? "jpg" : extension;
+
+    const buffer = fs.readFileSync(src);
+    const decodedImage = await codecs.jpg.decode(buffer);
+
+    // @ts-ignore
+    var { width: imageWidth = width, height: imageHeight = height } =
+      decodedImage;
+
+    if (!(width && height) && aspect) {
+      if (width) {
+        imageHeight = width / aspect;
+      } else if (height) {
+        imageWidth = height * aspect;
+      } else {
+        imageHeight = decodedImage.width / aspect;
+      }
+    }
+
+    // @ts-ignore
+    image =
+      imageWidth || imageHeight
+        ? // @ts-ignore
+          await decodedImage.resize({ width: imageWidth, height: imageHeight })
+        : decodedImage;
   }
 
-  let path = src;
-
   return {
-    path,
+    path: src,
     rest,
     image,
     imageWidth,
