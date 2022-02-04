@@ -9,7 +9,15 @@ import getImage from "./utils/getOptimizedImage.mjs";
 
 const optimizedImages = new Map();
 
-const sharp = false;
+const sharp = await (async () => {
+  try {
+    if (await import("sharp")) {
+      return true;
+    }
+  } catch (error) {
+    return false;
+  }
+})();
 
 const supportedFileTypes = [
   "avif",
