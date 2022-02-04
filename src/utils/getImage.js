@@ -30,10 +30,9 @@ export default async function (
   globalConfigOptions
 ) {
   const hash = crypto
-    .createHash("md5")
+    .createHash("sha256")
     .update(JSON.stringify(arguments))
-    .digest("hex")
-    .substring(0, 8);
+    .digest("hex");
 
   if (imagesData.has(hash)) {
     return imagesData.get(hash);
@@ -78,8 +77,10 @@ export default async function (
 
   const images = [...artDirectedImages, mainImage];
 
+  const uuid = crypto.randomBytes(4).toString("hex").toUpperCase();
+
   const returnObject = {
-    hash,
+    uuid,
     images,
   };
 
