@@ -4,7 +4,10 @@ export default {
   vite: {
     plugins: [astroImagePlugin],
     optimizeDeps: {
-      exclude: ["@astropub/codecs", "imagetools-core"],
+      exclude: ["@astropub/codecs", "imagetools-core", "sharp"],
+    },
+    ssr: {
+      external: ["@astropub/codecs", "imagetools-core", "sharp"],
     },
   },
 };

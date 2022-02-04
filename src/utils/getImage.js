@@ -7,15 +7,7 @@ import getProcessedImage from "./getProcessedImage";
 
 const imagesData = new Map();
 
-const sharp = await (async () => {
-  try {
-    if (await import("sharp")) {
-      return true;
-    }
-  } catch (error) {
-    return false;
-  }
-})();
+const sharp = true;
 
 export default async function (
   src,
