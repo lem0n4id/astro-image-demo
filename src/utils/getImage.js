@@ -42,6 +42,8 @@ export default async function (
     await getProcessedImage(src, sharp, configOptions, globalConfigOptions);
 
   src = path;
+
+  // @ts-ignore
   rest.aspect = `${imageWidth / imageHeight}`;
   fallbackFormat ||= imageFormat;
 
