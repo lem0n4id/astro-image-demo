@@ -24,6 +24,8 @@ export default async (src, sharp, configOptions, globalConfigOptions) => {
     src = `/${filepath}`;
   }
 
+  const path = src;
+
   configOptions = { ...globalConfigOptions, ...paramOptions, ...configOptions };
 
   configOptions.aspect &&= `${configOptions.aspect}`;
@@ -45,7 +47,7 @@ export default async (src, sharp, configOptions, globalConfigOptions) => {
 
     var { image, metadata } = await applyTransforms(
       generateTransforms({ width, height, aspect }, builtins).transforms,
-      loadImage(`.${src}`)
+      loadImage(`.${path}`)
     );
 
     var {
@@ -56,7 +58,7 @@ export default async (src, sharp, configOptions, globalConfigOptions) => {
   } else {
     const codecs = await import("@astropub/codecs");
 
-    const extension = extname(src).slice(1);
+    const extension = extname(path).slice(1);
 
     // @ts-ignore
     var imageFormat = extension === "jpeg" ? "jpg" : extension;
@@ -87,7 +89,7 @@ export default async (src, sharp, configOptions, globalConfigOptions) => {
   }
 
   return {
-    path: src,
+    path,
     rest,
     image,
     imageWidth,
