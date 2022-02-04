@@ -2,19 +2,28 @@
 
 import fs from "fs";
 import crypto from "crypto";
-import {
-  applyTransforms,
-  builtins,
-  generateTransforms,
-  loadImage,
-} from "./imagetools-core";
+import { extname } from "path";
 
-export default async (src, configOptions, globalConfigOptions) => {
+export default async (src, sharp, configOptions, globalConfigOptions) => {
   const { search, searchParams } = new URL(src, "file://");
 
   const paramOptions = Object.fromEntries(searchParams);
 
-  src = src.slice(0, src.lastIndexOf(search));
+  src = src.replace(search, "");
+
+  if (src.match("(http://|https://|data:image/).*")) {
+    const hash = crypto.createHash("sha256").update(src).digest("hex");
+    const directory = "node_modules/.cache";
+    const filepath = `${directory}/${hash}.jpeg`;
+    fs.existsSync(directory) || fs.mkdirSync(directory);
+    fs.existsSync(filepath) ||
+      fs.writeFileSync(
+        filepath,
+        Buffer.from(await (await fetch(src)).arrayBuffer())
+      );
+    src = `/${filepath}`;
+  }
+
   configOptions = { ...globalConfigOptions, ...paramOptions, ...configOptions };
 
   configOptions.aspect &&= `${configOptions.aspect}`;
@@ -30,30 +39,25 @@ export default async (src, configOptions, globalConfigOptions) => {
     ...rest
   } = configOptions;
 
-  if (src.match("(http://|https://|data:image/).*")) {
-    const hash = crypto.createHash("sha256").update(src).digest("hex");
-    const directory = "node_modules/.cache";
-    const filepath = `${directory}/${hash}.jpeg`;
-    fs.existsSync(directory) || fs.mkdirSync(directory);
-    fs.existsSync(filepath) ||
-      fs.writeFileSync(
-        filepath,
-        Buffer.from(await (await fetch(src)).arrayBuffer())
-      );
-    src = `/${filepath}`;
+  if (sharp) {
+    const { applyTransforms, builtins, generateTransforms, loadImage } =
+      await import("imagetools-core");
+
+    var { image, metadata } = await applyTransforms(
+      generateTransforms({ width, height, aspect }, builtins).transforms,
+      loadImage(`.${src}`)
+    );
+
+    var {
+      width: imageWidth,
+      height: imageHeight,
+      format: imageFormat,
+    } = metadata;
+  } else {
+    const codecs = await import("@astropub/codecs");
+
+    const extension = extname(src);
   }
-
-  const { image, metadata } = await applyTransforms(
-    generateTransforms({ width, height, aspect, w, h, ar }, builtins)
-      .transforms,
-    loadImage(`.${src}`)
-  );
-
-  const {
-    width: imageWidth,
-    height: imageHeight,
-    format: imageFormat,
-  } = metadata;
 
   let path = src;
 

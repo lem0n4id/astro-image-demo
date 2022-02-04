@@ -11,11 +11,17 @@ export default async function getLoadedImage(src, ext, sharp) {
   let image, imageWidth;
 
   if (sharp) {
-    image = (await import("imagetools-core")).loadImage(src);
+    const { loadImage } = await import("imagetools-core");
+
+    image = loadImage(src);
     imageWidth = (await image.metadata()).width;
   } else {
+    const codecs = await import("@astropub/codecs");
+
+    const format = ext === "jpeg" ? "jpg" : ext;
+
     const buffer = readFileSync(src);
-    image = (await import("@astropub/codecs"))[ext].decode(buffer);
+    image = codecs[format].decode(buffer);
     imageWidth = image.width;
   }
 

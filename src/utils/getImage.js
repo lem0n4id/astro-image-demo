@@ -7,6 +7,16 @@ import getProcessedImage from "./getProcessedImage";
 
 const imagesData = new Map();
 
+const sharp = await (async () => {
+  try {
+    if (await import("sharp")) {
+      return true;
+    }
+  } catch (error) {
+    return false;
+  }
+})();
+
 export default async function (
   src,
   format,
@@ -29,7 +39,7 @@ export default async function (
   }
 
   const { path, rest, image, imageWidth, imageHeight, imageFormat } =
-    await getProcessedImage(src, configOptions, globalConfigOptions);
+    await getProcessedImage(src, sharp, configOptions, globalConfigOptions);
 
   src = path;
   rest.aspect = `${imageWidth / imageHeight}`;
