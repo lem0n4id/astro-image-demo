@@ -3,7 +3,7 @@ import { Readable } from "stream";
 import { basename, extname } from "path";
 import { getConfigOptions, getImagePath } from "./utils/shared.mjs";
 
-const optimizedImages = new Map();
+const store = new Map();
 
 const sharp = await (async () => {
   try {
@@ -49,10 +49,9 @@ export default {
 
       const config = Object.fromEntries(searchParams);
 
-      const { image: loadedImage, width: imageWidth } = await getLoadedImage(
-        src,
-        ext
-      );
+      const { image: loadedImage, width: imageWidth } =
+        store.get(src) ||
+        store.set(src, await getLoadedImage(src, ext)).get(src);
 
       const { type, hash, widths, options, extension, inline } =
         getConfigOptions(config, ext, imageWidth);
@@ -68,8 +67,8 @@ export default {
 
         const { assetName } = getImagePath(base, extension, width, hash);
 
-        if (optimizedImages.has(assetName)) {
-          return `export default "${optimizedImages.get(assetName)}"`;
+        if (store.has(assetName)) {
+          return `export default "${store.get(assetName)}"`;
         } else {
           const config = { width, ...options };
 
@@ -77,7 +76,7 @@ export default {
 
           const { dataUri } = await getTransformedImage(...params);
 
-          optimizedImages.set(assetName, dataUri);
+          store.set(assetName, dataUri);
 
           return `export default "${dataUri}"`;
         }
@@ -86,7 +85,7 @@ export default {
           widths.map(async (width) => {
             const { name, path } = getImagePath(base, extension, width, hash);
 
-            if (!optimizedImages.has(path)) {
+            if (!store.has(path)) {
               const config = { width, ...options };
 
               const params = [src, loadedImage, config, type];
@@ -97,7 +96,7 @@ export default {
 
               const imageObject = { type, name, buffer, extension, image };
 
-              optimizedImages.set(path, imageObject);
+              store.set(path, imageObject);
             }
 
             return { width, path };
@@ -116,7 +115,7 @@ export default {
 
   configureServer(server) {
     server.middlewares.use(async (request, response, next) => {
-      const imageObject = optimizedImages.get(request.url);
+      const imageObject = store.get(request.url);
 
       if (imageObject) {
         const { type, buffer, image } = imageObject;
@@ -144,7 +143,7 @@ export default {
     }
 
     await Promise.all(
-      [...optimizedImages.entries()].map(async ([src, imageObject]) => {
+      [...store.entries()].map(async ([src, imageObject]) => {
         for (const output of outputs) {
           if (output.source.match(src)) {
             const { name, buffer, image } = imageObject;

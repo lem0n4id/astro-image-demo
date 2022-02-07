@@ -6,25 +6,12 @@ import {
   generateTransforms,
 } from "imagetools-core";
 
-const decodedImages = new Map();
-
 export const getLoadedImage = async (src) => {
-  if (decodedImages.has(src)) {
-    return decodedImages.get(src);
-  }
-
   const image = loadImage(src);
 
   const { width } = await image.metadata();
 
-  const returnObject = {
-    image,
-    width,
-  };
-
-  decodedImages.set(src, returnObject);
-
-  return returnObject;
+  return { image, width };
 };
 
 export const getTransformedImage = async (

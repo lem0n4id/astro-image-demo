@@ -2,32 +2,20 @@
 import * as codecs from "@astropub/codecs";
 import { readFileSync } from "fs";
 
-const decodedImages = new Map();
 const resizedImages = new Map();
 
 export const getLoadedImage = async (src, ext) => {
-  if (decodedImages.has(src)) {
-    return decodedImages.get(src);
-  }
-
   const buffer = readFileSync(src);
 
   const image = await codecs[ext].decode(buffer);
 
-  const key = `${src}@${image.width}`;
-
-  resizedImages.set(key, image);
-
   const { width } = image;
 
-  const returnObject = {
-    image,
-    width,
-  };
+  const resizedImageKey = `${src}@${image.width}`;
 
-  decodedImages.set(src, returnObject);
+  resizedImages.set(resizedImageKey, image);
 
-  return returnObject;
+  return { image, width };
 };
 
 export const getTransformedImage = async (
