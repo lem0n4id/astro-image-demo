@@ -7,7 +7,6 @@ const resizedImages = new Map();
 
 export const getLoadedImage = async (src, ext) => {
   if (decodedImages.has(src)) {
-    console.log("Using cached decoded image");
     return decodedImages.get(src);
   }
 
