@@ -2,32 +2,14 @@
 import { Readable } from "stream";
 import { basename, extname } from "path";
 import { getConfigOptions, getImagePath } from "./utils/shared.mjs";
+import {
+  sharp,
+  getLoadedImage,
+  getTransformedImage,
+  supportedFileTypes,
+} from "./utils/sharpCheck.mjs";
 
 const store = new Map();
-
-const sharp = await (async () => {
-  try {
-    if (await import("sharp")) {
-      return true;
-    }
-  } catch (error) {
-    return false;
-  }
-})();
-
-// @ts-ignore
-const { getLoadedImage, getTransformedImage } = await import(
-  `./utils/${sharp ? "imagetools" : "codecs"}.mjs`
-);
-
-const supportedFileTypes = [
-  "avif",
-  "jpeg",
-  "jpg",
-  "png",
-  "webp",
-  ...(sharp ? ["heic", "heif", "tiff", "gif"] : ["jxl", "wp2"]),
-];
 
 export default {
   name: "vite-plugin-astro-image",
