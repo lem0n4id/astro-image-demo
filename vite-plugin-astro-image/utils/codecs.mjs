@@ -21,8 +21,8 @@ export const getLoadedImage = async (src, ext) => {
   const { width } = image;
 
   const returnObject = {
-    loadedImage: image,
-    imageWidth: width,
+    image,
+    width,
   };
 
   decodedImages.set(src, returnObject);

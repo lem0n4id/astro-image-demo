@@ -18,8 +18,8 @@ export const getLoadedImage = async (src) => {
   const { width } = await image.metadata();
 
   const returnObject = {
-    loadedImage: image,
-    imageWidth: width,
+    image,
+    width,
   };
 
   decodedImages.set(src, returnObject);

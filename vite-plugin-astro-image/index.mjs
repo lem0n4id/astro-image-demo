@@ -49,7 +49,10 @@ export default {
 
       const config = Object.fromEntries(searchParams);
 
-      const { loadedImage, imageWidth } = await getLoadedImage(src, ext);
+      const { image: loadedImage, width: imageWidth } = await getLoadedImage(
+        src,
+        ext
+      );
 
       const { type, hash, widths, options, extension, inline } =
         getConfigOptions(config, ext, imageWidth);
