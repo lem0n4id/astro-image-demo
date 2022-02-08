@@ -3,13 +3,13 @@
 import util from "util";
 import potrace from "potrace";
 import stringifyParams from "./stringifyParams";
+import { sharp } from "./sharpCheck";
 
 export default async function getFallbackImage(
   src,
   placeholder,
   image,
   format,
-  sharp,
   formatOptions,
   rest
 ) {

@@ -2,9 +2,9 @@
 
 import fs from "fs";
 import crypto from "crypto";
-import { extname } from "path";
+import { getImageDetails } from "./sharpCheck";
 
-export default async (src, sharp, configOptions, globalConfigOptions) => {
+export default async (src, configOptions, globalConfigOptions) => {
   const { search, searchParams } = new URL(src, "file://");
 
   const paramOptions = Object.fromEntries(searchParams);
@@ -41,52 +41,12 @@ export default async (src, sharp, configOptions, globalConfigOptions) => {
     ...rest
   } = configOptions;
 
-  if (sharp) {
-    const { applyTransforms, builtins, generateTransforms, loadImage } =
-      await import("imagetools-core");
-
-    var { image, metadata } = await applyTransforms(
-      generateTransforms({ width, height, aspect }, builtins).transforms,
-      loadImage(`.${path}`)
-    );
-
-    var {
-      width: imageWidth,
-      height: imageHeight,
-      format: imageFormat,
-    } = metadata;
-  } else {
-    const codecs = await import("@astropub/codecs");
-
-    const extension = extname(path).slice(1);
-
-    // @ts-ignore
-    var imageFormat = extension === "jpeg" ? "jpg" : extension;
-
-    const buffer = fs.readFileSync(`.${src}`);
-    const decodedImage = await codecs.jpg.decode(buffer);
-
-    // @ts-ignore
-    var { width: imageWidth = width, height: imageHeight = height } =
-      decodedImage;
-
-    if (!(width && height) && aspect) {
-      if (width) {
-        imageHeight = width / aspect;
-      } else if (height) {
-        imageWidth = height * aspect;
-      } else {
-        imageHeight = decodedImage.width / aspect;
-      }
-    }
-
-    // @ts-ignore
-    image =
-      imageWidth || imageHeight
-        ? // @ts-ignore
-          await decodedImage.resize({ width: imageWidth, height: imageHeight })
-        : decodedImage;
-  }
+  const { image, imageWidth, imageHeight, imageFormat } = await getImageDetails(
+    path,
+    width,
+    height,
+    aspect
+  );
 
   return {
     path,
