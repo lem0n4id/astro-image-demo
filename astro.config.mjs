@@ -1,4 +1,4 @@
-import astroImagePlugin from "./vite-plugin-astro-image/index.mjs";
+import astroImagePlugin from "astro-image/plugin";
 
 export default {
   vite: {

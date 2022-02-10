@@ -9,11 +9,7 @@
     "build@static": "astro build --experimental-static-build"
   },
   "dependencies": {
-    "@astropub/codecs": "^0.4.4",
     "astro": "next",
-    "potrace": "^2.1.8"
-  },
-  "optionalDependencies": {
-    "imagetools-core": "^3.0.2"
+    "astro-imagetools": "^0.0.4"
   }
 }
