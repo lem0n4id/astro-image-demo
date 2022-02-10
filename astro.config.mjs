@@ -1,4 +1,4 @@
-import astroImagePlugin from "astro-image/plugin";
+import astroImagePlugin from "astro-imagetools/plugin";
 
 export default {
   vite: {
