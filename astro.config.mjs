@@ -7,7 +7,7 @@ export default {
       exclude: ["@astropub/codecs", "imagetools-core", "sharp"],
     },
     ssr: {
-      external: ["sharp"],
+      external: ["sharp", "potrace"],
     },
   },
 };
