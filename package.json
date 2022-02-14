@@ -9,7 +9,7 @@
     "build@static": "astro build --experimental-static-build"
   },
   "dependencies": {
-    "astro": "^0.23.0-next.4",
-    "astro-imagetools": "^0.0.12"
+    "astro": "^0.23.0-next.6",
+    "astro-imagetools": "^0.0.16"
   }
 }
