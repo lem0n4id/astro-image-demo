@@ -1,22 +1,11 @@
 ---
-import Image from "../../astro-imagetools/src/component/Image.astro";
-// import ReactImage from "../../astro-imagetools/src/component/ReactImage.tsx";
-// import PreactImage from "../../astro-imagetools/src/component/PreactImage.tsx";
-// import SolidImage from "../../astro-imagetools/src/component/SolidImage.tsx";
-// import VueImage from "../../astro-imagetools/src/component/VueImage.vue";
-// import SvelteImage from "../../astro-imagetools/src/component/SvelteImage.svelte";
-// import LitImage from "../../astro-imagetools/src/component/LitImage.lit";
+import Image from "astro-imagetools";
 ---
 
 <html>
   <body>
     <h1>Hello World!</h1>
     <Image
-      sizes={([, , maxWidth]) => {
-        console.log(maxWidth);
-        return `(min-width: ${maxWidth}px) ${maxWidth}px, 100vw`;
-      }}
-      preload="webp"
       src="/src/images/elva-800w.jpg"
       alt="A father holiding his beloved daughter in his arms"
     />
